@@ -4,6 +4,9 @@ dev:
 split:
 	ffmpeg -i IMG_2867.MOV -vf "fps=30" frames/frame_%06d.png
 
+stitch:
+	ffmpeg -framerate 30 -i "out/frame_%06d.png" -c:v libx264 -crf 23 -pix_fmt yuv420p output.mp4
+
 movie:
 	uv run --isolated --extra viz movie.py
 
@@ -30,6 +33,7 @@ tag: build
 	docker tag kosmos2-api:latest mindthemath/kosmos2-api:$$(date +%Y%m%d)-cu12.2.2
 	docker tag kosmos2-api:latest mindthemath/kosmos2-api:$$(date +%Y%m%d)
 	docker tag kosmos2-api:latest mindthemath/kosmos2-api:latest
+	docker images | grep mindthemath/kosmos2-api
 
 push: tag
 	docker push mindthemath/kosmos2-api:$$(date +%Y%m%d)-cu12.2.2
