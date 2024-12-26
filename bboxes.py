@@ -14,7 +14,7 @@ def is_overlapping(rect1, rect2):
     return not (x2 < x3 or x1 > x4 or y2 < y3 or y1 > y4)
 
 
-def draw_entity_boxes_on_image(image, entities, show=False, save_path=None):
+def draw_entity_boxes_on_image(image, entities, show=False, save_path=None, seed=19):
     """_summary_
     Args:
         image (_type_): image or image path
@@ -65,6 +65,8 @@ def draw_entity_boxes_on_image(image, entities, show=False, save_path=None):
     text_offset_original = text_height - base_height
     text_spaces = 3
 
+    if seed is not None:
+        np.random.seed(seed)
     for entity_name, (start, end), bboxes in entities:
         for x1_norm, y1_norm, x2_norm, y2_norm in bboxes:
             orig_x1, orig_y1, orig_x2, orig_y2 = (
