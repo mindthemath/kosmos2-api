@@ -116,7 +116,6 @@ regex==2024.11.6
     # via transformers
 requests==2.32.3
     # via
-    #   hf-ver (pyproject.toml)
     #   huggingface-hub
     #   transformers
 safetensors==0.4.5

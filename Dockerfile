@@ -24,9 +24,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY requirements.api.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
+RUN pip install pillow==11.0.0 litserve==0.2.5 python-multipart==0.0.20 hf-transfer==0.1.8
+RUN pip install torch==2.5.1
+RUN pip install transformers==4.47.1
+# COPY requirements.api.txt requirements.txt
+# RUN pip install --no-cache-dir -r requirements.txt
 
 ENV HF_ENABLE_HF_TRANSFER=1
 EXPOSE 8020

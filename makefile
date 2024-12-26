@@ -25,3 +25,13 @@ lint:
 
 run:
 	docker run --rm -ti --gpus all -p 8020:8020 kosmos2-api:latest
+
+tag: build
+	docker tag kosmos2-api:latest mindthemath/kosmos2-api:$$(date +%Y%m%d)-cu12.2.2
+	docker tag kosmos2-api:latest mindthemath/kosmos2-api:$$(date +%Y%m%d)
+	docker tag kosmos2-api:latest mindthemath/kosmos2-api:latest
+
+push: tag
+	docker push mindthemath/kosmos2-api:$$(date +%Y%m%d)-cu12.2.2
+	docker push mindthemath/kosmos2-api:$$(date +%Y%m%d)
+	docker push mindthemath/kosmos2-api:latest
