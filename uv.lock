@@ -247,7 +247,6 @@ api = [
     { name = "hf-transfer" },
     { name = "litserve" },
     { name = "python-multipart" },
-    { name = "requests" },
 ]
 viz = [
     { name = "opencv-python" },
@@ -259,6 +258,7 @@ dev = [
     { name = "black" },
     { name = "ipython" },
     { name = "isort" },
+    { name = "requests" },
 ]
 
 [package.metadata]
@@ -268,7 +268,6 @@ requires-dist = [
     { name = "opencv-python", marker = "extra == 'viz'", specifier = ">=4.10.0.84" },
     { name = "pillow", specifier = ">=11.0.0" },
     { name = "python-multipart", marker = "extra == 'api'", specifier = ">=0.0.20" },
-    { name = "requests", marker = "extra == 'api'", specifier = ">=2.32.3" },
     { name = "torch", specifier = ">=2.5.1" },
     { name = "torchvision", marker = "extra == 'viz'", specifier = ">=0.20.1" },
     { name = "transformers", specifier = ">=4.47.1" },
@@ -279,6 +278,7 @@ dev = [
     { name = "black", specifier = ">=24.10.0" },
     { name = "ipython", specifier = ">=8.31.0" },
     { name = "isort", specifier = ">=5.13.2" },
+    { name = "requests", specifier = ">=2.32.3" },
 ]
 
 [[package]]
