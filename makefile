@@ -17,11 +17,11 @@ build: requirements.api.txt
 	docker build -t kosmos2-api .
 
 test:
-	curl -X POST -F "content=@IMG_0395.jpg" http://127.0.0.1:8002/predict | jq '.output'
+	curl -X POST -F "content=@IMG_0395.jpg" http://127.0.0.1:8020/predict | jq '.output'
 
 lint:
 	uv run black .
 	uv run isort --profile black .
 
 run:
-	docker run --rm -ti --gpus all -p 8002:8000 kosmos2-api:latest
+	docker run --rm -ti --gpus all -p 8020:8020 kosmos2-api:latest

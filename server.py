@@ -116,7 +116,7 @@ if __name__ == "__main__":
         api_path="/predict",
     )
     server.run(
-        port=8000,
+        port=8020,
         host="0.0.0.0",
         num_api_servers=NUM_API_SERVERS,
         log_level=LOG_LEVEL.lower(),

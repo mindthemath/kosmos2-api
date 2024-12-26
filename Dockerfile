@@ -1,6 +1,6 @@
 # Change CUDA and cuDNN version here
-FROM nvidia/cuda:12.4.1-base-ubuntu22.04
-ARG PYTHON_VERSION=3.12
+FROM nvidia/cuda:12.2.2-base-ubuntu22.04
+ARG PYTHON_VERSION=3.11
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -22,17 +22,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-####### Add your own installation commands here #######
-# RUN pip install some-package
-# RUN wget https://path/to/some/data/or/weights
-# RUN apt-get update && apt-get install -y <package-name>
-
 WORKDIR /app
-# Install litserve and requirements
+
 COPY requirements.api.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY server.py /app
 
-EXPOSE 8000
+ENV HF_ENABLE_HF_TRANSFER=1
+EXPOSE 8020
+COPY server.py /app
 CMD ["python", "/app/server.py"]
