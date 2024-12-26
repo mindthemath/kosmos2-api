@@ -38,21 +38,19 @@ def process_image(image_path, prompt, output_dir="out"):
     return response
 
 
-def process_all_frames(frames_dir, model, processor, prompt, output_dir="out"):
+def process_all_frames(frames_dir, prompt, output_dir="out"):
     """
     Process all frames in a directory.
 
     Args:
         frames_dir (str): Directory containing the frames.
-        model: The vision-to-sequence model.
-        processor: The processor for the model.
         prompt (str): Text prompt for the model.
         output_dir (str): Directory to save processed output.
     """
     for frame_file in sorted(os.listdir(frames_dir)):
         if frame_file.lower().endswith((".png", ".jpg", ".jpeg")):
             image_path = os.path.join(frames_dir, frame_file)
-            data = process_image(image_path, model, processor, prompt, output_dir)
+            data = process_image(image_path, prompt, output_dir)
             json.dump(data, open(f"{output_dir}/{frame_file.split('.')[-2]}.json", "w"))
 
 
