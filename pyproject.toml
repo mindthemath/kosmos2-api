@@ -1,0 +1,31 @@
+[project]
+name = "hf-ver"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pillow>=11.0.0",
+    "torch>=2.5.1",
+    "transformers>=4.47.1",
+]
+
+[project.optional-dependencies]
+api = [
+    "litserve>=0.2.5",
+    "python-multipart>=0.0.20",
+    "requests>=2.32.3",
+    "hf-transfer>=0.1.8",
+]
+
+viz = [
+    "opencv-python>=4.10.0.84",
+    "torchvision>=0.20.1",
+]
+
+[dependency-groups]
+dev = [
+    "black>=24.10.0",
+    "ipython>=8.31.0",
+    "isort>=5.13.2",
+]

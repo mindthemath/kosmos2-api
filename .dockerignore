@@ -1,0 +1,16 @@
+.venv/
+makefile
+frames/
+out/
+example.py
+movie.py
+demo.py
+bboxes.py
+*.jpg
+*.JPG
+*.png
+*.PNG
+*.mp4
+*.MOV
+uv.lock
+requirements.txt

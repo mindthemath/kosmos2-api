@@ -1,0 +1,13 @@
+frames/
+out/
+*.PNG
+*.png
+*.JPEG
+*.JPG
+*.jpeg
+*.jpg
+*.mp4
+*.MOV
+
+__pycache__/
+*.ipynb_checkpoints/
