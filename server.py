@@ -6,6 +6,7 @@ import os
 from io import BytesIO
 
 import litserve as ls
+import torch
 
 # import tracemalloc
 from PIL import Image
@@ -27,9 +28,14 @@ logger = logging.getLogger(__name__)
 
 class Kosmos2API(ls.LitAPI):
     def setup(self, device):
-        model = AutoModelForVision2Seq.from_pretrained("microsoft/kosmos-2-patch14-224")
+        # torch.backends.cuda.matmul.allow_tf32 = True  # Allow TF32 on Ampere
+        # torch.backends.cudnn.benchmark = True  # Enable cudnn autotuner
+        model = AutoModelForVision2Seq.from_pretrained(
+            "microsoft/kosmos-2-patch14-224", torch_dtype=torch.float16
+        )
         self.processor = AutoProcessor.from_pretrained("microsoft/kosmos-2-patch14-224")
         self.model = model.to(device)
+        self.model.eval()  # Ensure eval mode
         self.prompt = DEFAULT_PROMPT
         self.device = device
 
