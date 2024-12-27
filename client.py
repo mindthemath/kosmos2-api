@@ -98,7 +98,7 @@ def process_frames_ray(
     max_retries=3,
     timeout_seconds=10,
     retry_delay=3,
-    max_concurrent=40,
+    max_concurrent=64,
 ):  # Control concurrent processing
     """Process frames using Ray with parallel execution"""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -209,8 +209,9 @@ if __name__ == "__main__":
     # print(process_image("IMG_0395.jpg", PROMPT, OUTPUT_DIR))
 
     start = time.time()
-    process_frames_ray(FRAMES_DIR, PROMPT, OUTPUT_DIR)
+    results = process_frames_ray(FRAMES_DIR, PROMPT, OUTPUT_DIR)
     # process_all_frames(FRAMES_DIR, PROMPT, OUTPUT_DIR)
     end = time.time()
     print(f"Time taken: {end - start} seconds")
+    print(f"Framerate: {len(results) / (end - start)} fps")
     ray.shutdown()

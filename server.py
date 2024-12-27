@@ -125,6 +125,6 @@ if __name__ == "__main__":
     server.run(
         port=8020,
         host="0.0.0.0",
-        num_api_servers=1,
+        # num_api_servers=1,
         log_level=LOG_LEVEL.lower(),
     )
