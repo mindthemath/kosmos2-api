@@ -114,10 +114,11 @@ if __name__ == "__main__":
         max_batch_size=MAX_BATCH_SIZE,  # needs to be > 1 to hit self.batch
         track_requests=True,
         api_path="/predict",
+        workers_per_device=NUM_API_SERVERS,
     )
     server.run(
         port=8020,
         host="0.0.0.0",
-        num_api_servers=NUM_API_SERVERS,
+        num_api_servers=1,
         log_level=LOG_LEVEL.lower(),
     )
