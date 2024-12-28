@@ -13,7 +13,8 @@ from PIL import Image
 from transformers import AutoModelForVision2Seq, AutoProcessor
 
 # tracemalloc.start()
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+PORT = int(os.environ.get("PORT", "8000"))
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 NUM_API_SERVERS = int(os.environ.get("NUM_API_SERVERS", "1"))
 MAX_BATCH_SIZE = int(os.environ.get("MAX_BATCH_SIZE", "2"))
 DEFAULT_PROMPT = os.environ.get("DEFAULT_PROMPT", "<grounding> Describe this image:")
@@ -123,7 +124,7 @@ if __name__ == "__main__":
         workers_per_device=NUM_API_SERVERS,
     )
     server.run(
-        port=8020,
+        port=PORT,
         host="0.0.0.0",
         # num_api_servers=1,
         log_level=LOG_LEVEL.lower(),
