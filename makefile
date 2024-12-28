@@ -19,17 +19,27 @@ requirements.api.txt: pyproject.toml
 	uv pip compile pyproject.toml --extra api -o requirements.api.txt
 
 build: requirements.api.txt
-	docker build -t kosmos2-api .
+	docker build -t kosmos2-api:latest .
 
-test:
-	curl -X POST -F "content=@IMG_0395.jpg" http://127.0.0.1:8020/predict | jq '.output'
+snowman.png:
+	wget https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/snowman.png
+
+test: snowman.png
+	curl -X POST -F "content=@snowman.png" http://127.0.0.1:8030/predict | jq '.output'
 
 lint:
 	uv run black .
 	uv run isort --profile black .
 
-run:
-	docker run --rm -ti --gpus all -p 8020:8020 kosmos2-api:latest
+run: build
+	docker run --rm -ti \
+	--gpus all \
+	-p 8030:8000 \
+	-e NUM_API_SERVERS=$(or $(NUM_API_SERVERS),1) \
+	-e MAX_BATCH_SIZE=$(or $(MAX_BATCH_SIZE),1) \
+	-e LOG_LEVEL=$(or $(LOG_LEVEL),INFO) \
+	kosmos2-api:latest
+
 
 tag: build
 	docker tag kosmos2-api:latest mindthemath/kosmos2-api:$$(date +%Y%m%d)-cu12.2.2
