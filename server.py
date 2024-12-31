@@ -21,7 +21,7 @@ DEFAULT_PROMPT = os.environ.get("DEFAULT_PROMPT", "<grounding> Describe this ima
 
 # Set up logging
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=getattr(logging, LOG_LEVEL.upper()),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
