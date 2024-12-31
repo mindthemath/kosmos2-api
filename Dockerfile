@@ -31,6 +31,6 @@ COPY requirements.api.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 ENV HF_ENABLE_HF_TRANSFER=1
-EXPOSE 8020
+EXPOSE 8000
 COPY server.py /app
 CMD ["python", "/app/server.py"]

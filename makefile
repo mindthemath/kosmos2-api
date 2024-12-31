@@ -27,16 +27,17 @@ test: snowman.png
 	curl -X POST -F "content=@snowman.png" http://127.0.0.1:8000/predict | jq '.output'
 
 lint:
-	uv run black .
-	uv run isort --profile black .
+	uvx black .
+	uvx isort --profile black .
 
 run:
 	docker run --rm -ti \
 	--gpus all \
-	-p 8000:8000 \
+	-p 8020:8000 \
 	-e NUM_API_SERVERS=$(or $(NUM_API_SERVERS),1) \
 	-e MAX_BATCH_SIZE=$(or $(MAX_BATCH_SIZE),1) \
 	-e LOG_LEVEL=$(or $(LOG_LEVEL),INFO) \
+	-e PORT=8000 \
 	mindthemath/kosmos2-api:latest
 
 tag: build
