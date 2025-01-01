@@ -46,6 +46,7 @@ def process_image(image_path, prompt, output_dir="out", session=None, save_image
         prompt (str): Text prompt for the model.
         output_dir (str): Directory to save processed output.
         session (requests.Session): Optional session object to reuse.
+        save_image (bool): Whether to save the output image.
 
     Returns:
         dict: Entities detected in the image.
