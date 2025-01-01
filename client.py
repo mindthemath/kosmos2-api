@@ -21,14 +21,23 @@ ray.init()
 
 
 # need equivalent of 	curl -X POST -F "content=@IMG_0395.jpg" http://127.0.0.1:8020/predict | jq '.output'
-def predict(image_path):
+def predict(image_path, prompt, session=None):
+    if session is None:
+        session = requests.Session()
     url = "http://127.0.0.1:8020/predict"
     files = {"content": open(image_path, "rb")}
-    response = requests.post(url, files=files)
+    data = {"prompt": prompt}
+    # add auth header
+    auth = os.environ.get("LIGHTNING_API_KEY")
+    if auth is None:
+        auth_header = None
+    else:
+        auth_header = {"Authorization": f"Bearer {auth}"}
+    response = session.post(url, files=files, data=data, headers=auth_header)
     return response.json()
 
 
-def process_image(image_path, prompt, output_dir="out"):
+def process_image(image_path, prompt, output_dir="out", session=None, save_image=True):
     """
     Process a single image to generate text and extract entities.
 
@@ -36,59 +45,47 @@ def process_image(image_path, prompt, output_dir="out"):
         image_path (str): Path to the input image.
         prompt (str): Text prompt for the model.
         output_dir (str): Directory to save processed output.
+        session (requests.Session): Optional session object to reuse.
 
     Returns:
         dict: Entities detected in the image.
     """
     image = Image.open(image_path)
-    response = predict(image_path)
+    response = predict(image_path, prompt, session)
     entities = response["entities"]
     # Save output image with entity boxes
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, os.path.basename(image_path))
-    draw_entity_boxes_on_image(image, entities, show=False, save_path=output_path)
+    if save_image:
+        output_path = os.path.join(output_dir, os.path.basename(image_path))
+        draw_entity_boxes_on_image(image, entities, show=False, save_path=output_path)
     output_json_path = f"{output_dir}/{image_path.split('.')[-2]}.json"
     os.makedirs(os.path.dirname(output_json_path), exist_ok=True)
     json.dump(response, open(output_json_path, "w"))
     return response
 
 
-def process_all_frames(frames_dir, prompt, output_dir="out"):
-    """
-    Process all frames in a directory.
+# def process_all_frames(frames_dir, prompt, output_dir="out"):
+#     """
+#     Process all frames in a directory.
 
-    Args:
-        frames_dir (str): Directory containing the frames.
-        prompt (str): Text prompt for the model.
-        output_dir (str): Directory to save processed output.
-    """
-    for frame_file in sorted(os.listdir(frames_dir))[:120]:
-        if frame_file.lower().endswith((".png", ".jpg", ".jpeg")):
-            image_path = os.path.join(frames_dir, frame_file)
-            data = process_image(image_path, prompt, output_dir)
+#     Args:
+#         frames_dir (str): Directory containing the frames.
+#         prompt (str): Text prompt for the model.
+#         output_dir (str): Directory to save processed output.
+#     """
+#     for frame_file in sorted(os.listdir(frames_dir))[:120]:
+#         if frame_file.lower().endswith((".png", ".jpg", ".jpeg")):
+#             image_path = os.path.join(frames_dir, frame_file)
+#             data = process_image(image_path, prompt, output_dir)
 
 
 @ray.remote
-def process_image_ray(image_path, prompt, output_dir="out", timeout_seconds=30):
-    """Ray-compatible version of process_image with timeout"""
-    logger.info(f"Starting to process: {image_path}")
+class APIWorker:
+    def __init__(self):
+        self.session = requests.Session()  # Reuse connection
 
-    # Wrap the process_image call with timeout
-    try:
-        result = process_image(image_path, prompt, output_dir)
-
-        # Verify the output file exists
-        frame_name = Path(image_path).stem
-        expected_output = Path(output_dir) / f"{frame_name}.png"
-
-        if not expected_output.exists():
-            raise FileNotFoundError(f"Output file not created: {expected_output}")
-
-        logger.info(f"Successfully processed: {image_path}")
-        return result
-    except Exception as e:
-        logger.error(f"Error in process_image_ray: {str(e)}")
-        raise  # Re-raise to be caught by the main function
+    def predict(self, image_path, prompt):
+        return process_image(image_path, prompt, output_dir="out", session=self.session)
 
 
 def process_frames_ray(
@@ -97,11 +94,14 @@ def process_frames_ray(
     output_dir="out",
     max_retries=3,
     timeout_seconds=10,
-    retry_delay=3,
-    max_concurrent=64,
-):  # Control concurrent processing
-    """Process frames using Ray with parallel execution"""
+    retry_delay=1,
+    num_workers=32,  # Number of concurrent workers
+):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    # Create a pool of workers
+    workers = [APIWorker.remote() for _ in range(num_workers)]
+    worker_idx = 0
 
     image_files = sorted(
         [
@@ -111,34 +111,28 @@ def process_frames_ray(
         ]
     )
 
-    if not image_files:
-        logger.error(f"No image files found in {frames_dir}")
-        return []
-
-    logger.info(f"Found {len(image_files)} images to process")
-
-    # Submit all tasks initially
-    pending_futures = {
-        process_image_ray.remote(str(img), prompt, output_dir): {
-            "path": str(img),
-            "retries": 0,
-        }
-        for img in image_files
-    }
+    # Submit initial batch of tasks
+    pending_futures = {}
+    for img in image_files:
+        worker = workers[worker_idx]
+        future = worker.predict.remote(str(img), prompt)
+        pending_futures[future] = {"path": str(img), "retries": 0}
+        worker_idx = (worker_idx + 1) % num_workers
 
     results = []
     failed_files = []
 
-    # Process results as they complete
     while pending_futures:
-        # Wait for one task to complete with timeout
         done_futures, remaining_futures = ray.wait(
             list(pending_futures.keys()),
             timeout=timeout_seconds,
-            num_returns=1,  # Process one result at a time
+            num_returns=min(num_workers, len(pending_futures)),
         )
 
         for future in done_futures:
+            if future not in pending_futures:
+                continue
+
             image_info = pending_futures[future]
             image_path = image_info["path"]
 
@@ -158,13 +152,14 @@ def process_frames_ray(
                     )
                     time.sleep(retry_delay)
 
-                    # Resubmit the task
-                    new_future = process_image_ray.remote(
-                        image_path, prompt, output_dir
-                    )
+                    # Resubmit using next available worker
+                    worker = workers[worker_idx]
+                    worker_idx = (worker_idx + 1) % num_workers
+                    new_future = worker.predict.remote(image_path, prompt)
                     pending_futures[new_future] = {
                         "path": image_path,
                         "retries": retry_count,
+                        "prompt": prompt,
                     }
 
                 else:
@@ -172,10 +167,8 @@ def process_frames_ray(
                     failed_files.append(
                         {"path": image_path, "error": str(e), "attempts": retry_count}
                     )
-
                 pending_futures.pop(future)
 
-        # If no futures completed in this iteration, wait a bit to prevent busy-waiting
         if not done_futures:
             time.sleep(0.1)
 
@@ -201,7 +194,8 @@ if __name__ == "__main__":
     # Configuration
     FRAMES_DIR = "frames"
     OUTPUT_DIR = "out"
-    PROMPT = "<grounding> Find the white fish in the image:"
+    # PROMPT = "<grounding> Find the white fish in the image:"
+    PROMPT = "<grounding> Describe the scene in detail, using rich vocabulary:"
 
     # Initialize model and processor
 
