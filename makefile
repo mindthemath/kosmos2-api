@@ -1,12 +1,16 @@
 dev:
-	MAX_BATCH_SIZE=1 NUM_API_SERVERS=5 LOG_LEVEL=INFO uv run --isolated --extra api server.py
+	PORT=8020 MAX_BATCH_SIZE=1 NUM_API_SERVERS=5 LOG_LEVEL=INFO uv run --isolated --extra api server.py
+
+input.mp4:
+	curl -fsSL https://cdn.math.computer/v/kosmos2/fish/sm/input.mp4 -o input.mp4
 
 split:
-	# ffmpeg -i IMG_2867.MOV -vf "fps=30" frames/frame_%06d.png
-	ffmpeg -i IMG_2867.MOV -vf "fps=30,scale='min(iw/3,iw):min(ih/3,ih)'" frames/frame_%06d.png
+	mkdir -p frames
+	# ffmpeg -i input.mp4 -vf "fps=30" frames/frame_%06d.png
+	ffmpeg -i input.mp4 -vf "fps=30,scale='min(iw/3,iw):min(ih/3,ih)'" frames/frame_%06d.png
 
 stitch:
-	ffmpeg -framerate 30 -i 'out/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p output.mp4
+	ffmpeg -framerate 30 -i 'frames/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p input.mp4
 
 movie:
 	uv run --isolated --extra viz --with ray client.py
@@ -24,7 +28,7 @@ snowman.png:
 	curl -fsSL https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/snowman.png -o snowman.png
 
 test: snowman.png
-	curl -X POST -F "content=@snowman.png" http://127.0.0.1:8000/predict | jq '.output'
+	curl -X POST -F "content=@snowman.png" http://127.0.0.1:8020/predict | jq '.output'
 
 lint:
 	uvx black .
