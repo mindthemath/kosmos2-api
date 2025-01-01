@@ -1,3 +1,5 @@
+[![Build and Push Docker Image](https://github.com/mindthemath/kosmos-2-api/actions/workflows/docker.yml/badge.svg)](https://github.com/mindthemath/kosmos-2-api/actions/workflows/docker.yml)
+
 # Kosmos-2 (as an API)
 
 * Kosmos-2 is a Multimodal Large Language Model (MLLM) that enables new capabilities of perceiving object descriptions (e.g., bounding boxes) and grounding text to the visual world.
