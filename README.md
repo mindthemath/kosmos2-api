@@ -1,4 +1,5 @@
 [![Build and Push Docker Image](https://github.com/mindthemath/kosmos-2-api/actions/workflows/docker.yml/badge.svg)](https://github.com/mindthemath/kosmos-2-api/actions/workflows/docker.yml)
+[![Docker Image](https://img.shields.io/docker/v/mindthemath/kosmos2-api/latest)](https://hub.docker.com/r/mindthemath/kosmos2-api/tags)
 
 # Kosmos-2 (as an API)
 
