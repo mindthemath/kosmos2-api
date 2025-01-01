@@ -3,7 +3,7 @@ dev:
 
 split:
 	# ffmpeg -i IMG_2867.MOV -vf "fps=30" frames/frame_%06d.png
-	ffmpeg -i IMG_2867.MOV -vf "fps=30,scale='min(iw/5,iw):min(ih/5,ih)'" frames/frame_%06d.png
+	ffmpeg -i IMG_2867.MOV -vf "fps=30,scale='min(iw/3,iw):min(ih/3,ih)'" frames/frame_%06d.png
 
 stitch:
 	ffmpeg -framerate 30 -i 'out/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p output.mp4
