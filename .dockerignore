@@ -14,3 +14,5 @@ bboxes.py
 *.MOV
 uv.lock
 requirements.txt
+README.md
+.vscode/
