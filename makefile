@@ -10,7 +10,7 @@ split:
 	ffmpeg -i input.mp4 -vf "fps=30,scale='min(iw/3,iw):min(ih/3,ih)'" frames/frame_%06d.png
 
 stitch:
-	ffmpeg -framerate 30 -i 'frames/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p input.mp4
+	ffmpeg -framerate 30 -i 'out/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p output.mp4
 
 movie:
 	uv run --isolated --extra viz --with ray client.py
