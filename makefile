@@ -46,7 +46,7 @@ snowman.png:
 	curl -fsSL https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/snowman.png -o snowman.png
 
 test: snowman.png
-	curl -X POST -F "content=@snowman.png" http://127.0.0.1:8020/predict | jq '.output'
+	curl -X POST -F "content=@snowman.png" http://127.0.0.1:8020/predict | jq .output
 
 lint:
 	uvx black .
@@ -72,3 +72,10 @@ push: tag
 	docker push mindthemath/kosmos2-api:$$(date +%Y%m%d)-cu12.2.2
 	docker push mindthemath/kosmos2-api:$$(date +%Y%m%d)
 	docker push mindthemath/kosmos2-api:latest
+
+parse:
+	@ls out/frames | parallel --jobs 12 jq .entities out/frames/{}
+
+term=spider
+ratio:
+	@echo "scale=2; $$(make parse | grep -c $(term)) / $$(ls out/frames/ | wc -l)" | bc

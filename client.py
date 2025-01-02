@@ -194,7 +194,6 @@ if __name__ == "__main__":
     # Configuration
     FRAMES_DIR = "frames"
     OUTPUT_DIR = "out"
-    # PROMPT = "<grounding> Find the white fish in the image:"
     PROMPT = "<grounding> Describe the scene in detail:"
 
     # Initialize model and processor
