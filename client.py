@@ -53,12 +53,11 @@ def process_image(image_path, prompt, output_dir="out", session=None, save_image
     """
     image = Image.open(image_path)
     response = predict(image_path, prompt, session)
-    entities = response["entities"]
     # Save output image with entity boxes
     os.makedirs(output_dir, exist_ok=True)
     if save_image:
         output_path = os.path.join(output_dir, os.path.basename(image_path))
-        draw_entity_boxes_on_image(image, entities, show=False, save_path=output_path)
+        draw_entity_boxes_on_image(image, response, show=False, save_path=output_path)
     output_json_path = f"{output_dir}/{image_path.split('.')[-2]}.json"
     os.makedirs(os.path.dirname(output_json_path), exist_ok=True)
     json.dump(response, open(output_json_path, "w"))
@@ -196,7 +195,7 @@ if __name__ == "__main__":
     FRAMES_DIR = "frames"
     OUTPUT_DIR = "out"
     # PROMPT = "<grounding> Find the white fish in the image:"
-    PROMPT = "<grounding> Describe the scene in detail, using rich vocabulary:"
+    PROMPT = "<grounding> Describe the scene in detail:"
 
     # Initialize model and processor
 

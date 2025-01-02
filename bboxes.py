@@ -1,4 +1,5 @@
 import os
+from textwrap import wrap
 
 import cv2
 import numpy as np
@@ -14,12 +15,17 @@ def is_overlapping(rect1, rect2):
     return not (x2 < x3 or x1 > x4 or y2 < y3 or y1 > y4)
 
 
-def draw_entity_boxes_on_image(image, entities, show=False, save_path=None, seed=19):
+def draw_entity_boxes_on_image(image, response, show=False, save_path=None, seed=19):
     """_summary_
     Args:
         image (_type_): image or image path
-        collect_entity_location (_type_): _description_
+        response (dict): response from the model
+        show (bool): whether to show the image
+        save_path (str): path to save the image, if None, no image is saved
+        seed (int): seed for random coloring of bounding boxes
     """
+    entities = response["entities"]
+    answer = response["output"]  # answer to the prompt
     if isinstance(image, Image.Image):
         image_h = image.height
         image_w = image.width
@@ -149,6 +155,44 @@ def draw_entity_boxes_on_image(image, entities, show=False, save_path=None, seed
             # previous_locations.append((x1, y1))
             previous_bboxes.append((text_bg_x1, text_bg_y1, text_bg_x2, text_bg_y2))
 
+    # add answer to the image - use black border on text and white text
+    # Draw black border first
+    # Position text at bottom with 20px margin
+    bottom_left = (image_w // 50, 95 * image_h // 100)
+    # wrap answer text in a box
+    answer_lines = wrap(answer, width=image_w // 9)
+    line_height = image_h // 20  # Pixels between lines
+    fsize = np.round(image_h / 1000, 4)
+    border_width = 3
+    text_width = 1
+
+    for i, line in enumerate(answer_lines):
+        # Calculate y position for each line
+        y_pos = bottom_left[1] - (len(answer_lines) - 1 - i) * line_height
+
+        # Draw black border
+        cv2.putText(
+            new_image,
+            line,
+            (bottom_left[0], y_pos),
+            cv2.FONT_HERSHEY_COMPLEX,
+            fsize,
+            (0, 0, 0),
+            border_width,
+            cv2.LINE_AA,
+        )
+
+        # Draw white text on top
+        cv2.putText(
+            new_image,
+            line,
+            (bottom_left[0], y_pos),
+            cv2.FONT_HERSHEY_COMPLEX,
+            fsize,
+            (255, 255, 255),
+            text_width,
+            cv2.LINE_AA,
+        )
     pil_image = Image.fromarray(new_image[:, :, [2, 1, 0]])
     if save_path:
         pil_image.save(save_path)
@@ -165,12 +209,16 @@ if __name__ == "__main__":
         "https://huggingface.co/microsoft/kosmos-2-patch14-224/resolve/main/snowman.png"
     )
     image = Image.open(requests.get(url, stream=True).raw)
-
+    # image = Image.open("frames/frame_000001.png")
     # From the previous code example
-    entities = [
+    response = {}
+    response["entities"] = [
         ("a snowman", (12, 21), [(0.390625, 0.046875, 0.984375, 0.828125)]),
         ("a fire", (41, 47), [(0.171875, 0.015625, 0.484375, 0.890625)]),
     ]
+    response["output"] = (
+        "A snowman is sitting in a snowy field. There is a fire in the foreground. This is a much longer piece of text to test the wrapping. More and more lines."
+    )
 
     # Draw the bounding bboxes
-    draw_entity_boxes_on_image(image, entities, show=False, save_path="snowman.jpg")
+    draw_entity_boxes_on_image(image, response, show=False, save_path="snowman.jpg")

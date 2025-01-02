@@ -1,19 +1,37 @@
 dev:
 	PORT=8020 MAX_BATCH_SIZE=1 NUM_API_SERVERS=5 LOG_LEVEL=INFO uv run --isolated --extra api server.py
 
-input.mp4:
-	curl -fsSL https://cdn.math.computer/v/kosmos2/fish/sm/input.mp4 -o input.mp4
+fish.mov:
+	curl -fsSL https://cdn.math.computer/v/kosmos2/fish/IMG_2867.MOV -o fish.mov
 
-scale=1
-split: input.mp4
-	mkdir -p frames
-	ffmpeg -i input.mp4 -vf "fps=30,scale='min(iw/$(scale),iw):min(ih/$(scale),ih)'" frames/frame_%06d.png
+betty.mov:
+	curl -fsSL https://cdn.math.computer/v/kosmos2/betty/IMG_2647.mov -o betty.mov
 
-stitch:
+input.mp4: frames/frame_000001.png
+	ffmpeg -framerate 30 -i 'frames/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p input.mp4
+	# curl -fsSL https://cdn.math.computer/v/kosmos2/fish/sm/input.mp4 -o input.mp4
+
+clean-frames:
+	rm -rf frames && mkdir -p frames
+
+scale=3
+file=fish.mov
+frames/frame_000001.png: $(file)
+	ffmpeg -i $(file) -vf "fps=30,scale='min(iw/$(scale),iw):min(ih/$(scale),ih)'" frames/frame_%06d.png
+	@du -sh frames
+
+out/frame_000001.png: client.py bboxes.py frames/frame_000001.png
+	rm -rf out && mkdir -p out
+	uv run --isolated --extra viz --with ray client.py
+
+output.mp4: out/frame_000001.png
 	ffmpeg -framerate 30 -i 'out/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p output.mp4
 
-movie:
-	uv run --isolated --extra viz --with ray client.py
+split: frames/frame_000001.png
+
+stitch: output.mp4
+
+movie: output.mp4
 
 requirements.txt: pyproject.toml
 	uv pip compile pyproject.toml --extra api --extra viz -o requirements.txt
