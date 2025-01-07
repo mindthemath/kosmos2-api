@@ -157,24 +157,34 @@ def draw_entity_boxes_on_image(image, response, show=False, save_path=None, seed
 
     # add answer to the image - use black border on text and white text
     # Draw black border first
-    # Position text at bottom with 20px margin
-    bottom_left = (image_w // 50, 95 * image_h // 100)
-    # wrap answer text in a box
-    answer_lines = wrap(answer, width=image_w // 9)
-    line_height = image_h // 20  # Pixels between lines
+    top_left = (image_w // 50, 5 * image_h // 100)
     fsize = np.round(image_h / 1000, 4)
     border_width = 3
     text_width = 1
 
+    # Calculate maximum width based on font size
+    sample_text = "A" * 50  # Sample text to measure character width
+    (text_width_px, text_height_px), _ = cv2.getTextSize(
+        sample_text, cv2.FONT_HERSHEY_COMPLEX, fsize, text_width
+    )
+    avg_char_width = text_width_px / 50  # Average width per character
+    max_chars_per_line = int(
+        (image_w - 2 * top_left[0]) / avg_char_width
+    )  # Account for margins
+
+    # wrap answer text in a box with calculated width
+    answer_lines = wrap(answer, width=max_chars_per_line)
+    line_height = image_h // 20  # Pixels between lines
+
     for i, line in enumerate(answer_lines):
-        # Calculate y position for each line
-        y_pos = bottom_left[1] - (len(answer_lines) - 1 - i) * line_height
+        # Calculate y position for each line, going top-down
+        y_pos = top_left[1] + i * line_height
 
         # Draw black border
         cv2.putText(
             new_image,
             line,
-            (bottom_left[0], y_pos),
+            (top_left[0], y_pos),
             cv2.FONT_HERSHEY_COMPLEX,
             fsize,
             (0, 0, 0),
@@ -186,7 +196,7 @@ def draw_entity_boxes_on_image(image, response, show=False, save_path=None, seed
         cv2.putText(
             new_image,
             line,
-            (bottom_left[0], y_pos),
+            (top_left[0], y_pos),
             cv2.FONT_HERSHEY_COMPLEX,
             fsize,
             (255, 255, 255),
