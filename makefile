@@ -7,6 +7,10 @@ fish.mov:
 betty.mov:
 	curl -fsSL https://cdn.math.computer/v/kosmos2/betty/IMG_2647.mov -o betty.mov
 
+
+frames.tar.gz:
+	cd out && tar cvzf frames.tar.gz frames/ && cd .. && mv out/frames.tar.gz .
+
 input.mp4: frames/frame_000001.png
 	ffmpeg -framerate 30 -i 'frames/frame_%06d.png' -c:v libx264 -crf 23 -pix_fmt yuv420p input.mp4
 	# curl -fsSL https://cdn.math.computer/v/kosmos2/fish/sm/input.mp4 -o input.mp4
