@@ -13,3 +13,5 @@ out/
 __pycache__/
 *.ipynb_checkpoints/
 .vscode
+*.txt
+*.tar.gz
