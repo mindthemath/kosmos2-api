@@ -107,12 +107,6 @@ class Kosmos2API(ls.LitAPI):
             )
         return data
 
-    def unbatch(self, output):
-        return [output]  # align with syntax for MAX_BATCH_SIZE=1
-
-    def encode_response(self, output):
-        return output[0]
-
 
 if __name__ == "__main__":
     server = ls.LitServer(
