@@ -7,6 +7,9 @@ fish.mov:
 betty.mov:
 	curl -fsSL https://cdn.math.computer/v/kosmos2/betty/IMG_2647.mov -o betty.mov
 
+stripes.mov:
+	curl -fsSL https://cdn.math.computer/v/kosmos2/stripes/input.mov -o stripes.mov
+
 
 frames.tar.gz:
 	cd out && tar cvzf frames.tar.gz frames/ && cd .. && mv out/frames.tar.gz .
@@ -21,6 +24,7 @@ clean-frames:
 scale=3
 file=fish.mov
 frames/frame_000001.png: $(file)
+	mkdir -p frames
 	ffmpeg -i $(file) -vf "fps=30,scale='min(iw/$(scale),iw):min(ih/$(scale),ih)'" frames/frame_%06d.png
 	@du -sh frames
 
@@ -51,6 +55,9 @@ snowman.png:
 
 test: snowman.png
 	curl -X POST -F "content=@snowman.png" http://127.0.0.1:8020/predict | jq .output
+
+ptest: snowman.png
+	seq 1 23 | parallel --jobs 24 "curl -X POST -F 'content=@snowman.png' http://127.0.0.1:8020/predict 2>&1 || echo 'Request failed'"
 
 lint:
 	uvx black .
