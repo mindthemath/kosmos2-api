@@ -1,5 +1,5 @@
 dev:
-	PORT=8020 MAX_BATCH_SIZE=1 NUM_API_SERVERS=5 LOG_LEVEL=INFO uv run --isolated --extra api server.py
+	PORT=8020 MAX_BATCH_SIZE=8 NUM_API_SERVERS=2 LOG_LEVEL=INFO uv run --isolated --extra api server.py
 
 fish.mov:
 	curl -fsSL https://cdn.math.computer/v/kosmos2/fish/IMG_2867.MOV -o fish.mov
@@ -10,8 +10,10 @@ betty.mov:
 stripes.mov:
 	curl -fsSL https://cdn.math.computer/v/kosmos2/stripes/input.mov -o stripes.mov
 
+go.mp4:
+	yt-dlp https://www.youtube.com/watch?v=LO2RPDZkY88
 
-frames.tar.gz:
+frames.tar.gz: out/frames/frame_000001.json
 	cd out && tar cvzf frames.tar.gz frames/ && cd .. && mv out/frames.tar.gz .
 
 input.mp4: frames/frame_000001.png
