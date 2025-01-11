@@ -21,6 +21,11 @@ viz = [
     "opencv-python>=4.10.0.84",
     "torchvision>=0.20.1",
 ]
+embed = [
+    "einops>=0.8.0",
+    "pillow>=11.0.0",
+    "transformers>=4.47.1",
+]
 
 [dependency-groups]
 dev = [

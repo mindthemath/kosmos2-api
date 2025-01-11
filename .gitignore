@@ -15,3 +15,8 @@ __pycache__/
 .vscode
 *.txt
 *.tar.gz
+data
+*.csv
+data/
+*.npy
+*.json

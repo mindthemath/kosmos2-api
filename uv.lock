@@ -157,6 +157,15 @@ wheels = [
 ]
 
 [[package]]
+name = "einops"
+version = "0.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/79/ca/9f5dcb8bead39959454c3912266bedc4c315839cee0e0ca9f4328f4588c1/einops-0.8.0.tar.gz", hash = "sha256:63486517fed345712a8385c100cb279108d9d47e6ae59099b07657e983deae85", size = 58861 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/5a/f0b9ad6c0a9017e62d4735daaeb11ba3b6c009d69a26141b258cd37b5588/einops-0.8.0-py3-none-any.whl", hash = "sha256:9572fb63046264a862693b0a87088af3bdc8c068fde03de63453cbbde245465f", size = 43223 },
+]
+
+[[package]]
 name = "executing"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -248,6 +257,11 @@ api = [
     { name = "litserve" },
     { name = "python-multipart" },
 ]
+embed = [
+    { name = "einops" },
+    { name = "pillow" },
+    { name = "transformers" },
+]
 viz = [
     { name = "opencv-python" },
     { name = "torchvision" },
@@ -263,14 +277,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "einops", marker = "extra == 'embed'", specifier = ">=0.8.0" },
     { name = "hf-transfer", marker = "extra == 'api'", specifier = ">=0.1.8" },
     { name = "litserve", marker = "extra == 'api'", specifier = ">=0.2.5" },
     { name = "opencv-python", marker = "extra == 'viz'", specifier = ">=4.10.0.84" },
     { name = "pillow", specifier = ">=11.0.0" },
+    { name = "pillow", marker = "extra == 'embed'", specifier = ">=11.0.0" },
     { name = "python-multipart", marker = "extra == 'api'", specifier = ">=0.0.20" },
     { name = "torch", specifier = ">=2.5.1" },
     { name = "torchvision", marker = "extra == 'viz'", specifier = ">=0.20.1" },
     { name = "transformers", specifier = ">=4.47.1" },
+    { name = "transformers", marker = "extra == 'embed'", specifier = ">=4.47.1" },
 ]
 
 [package.metadata.requires-dev]
