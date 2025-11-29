@@ -44,10 +44,10 @@ stitch: output.mp4
 movie: output.mp4
 
 requirements.txt: pyproject.toml
-	uv pip compile pyproject.toml --extra api --extra viz -o requirements.txt
+	uv pip compile pyproject.toml --extra api --extra viz --upgrade -o requirements.txt
 
 requirements.api.txt: pyproject.toml
-	uv pip compile pyproject.toml --extra api -o requirements.api.txt
+	uv pip compile pyproject.toml --extra api --upgrade -o requirements.api.txt
 
 build: requirements.api.txt
 	docker build -t kosmos2-api:latest .

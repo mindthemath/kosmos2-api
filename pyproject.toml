@@ -6,8 +6,8 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "pillow>=11.0.0",
-    "torch>=2.5.1",
-    "transformers>=4.47.1",
+    "torch>=2.8.0,<3",
+    "transformers>=4.48.0",
 ]
 
 [project.optional-dependencies]
@@ -24,12 +24,12 @@ viz = [
 embed = [
     "einops>=0.8.0",
     "pillow>=11.0.0",
-    "transformers>=4.47.1",
+    "transformers>=4.48.0",
 ]
 
 [dependency-groups]
 dev = [
-    "requests>=2.32.3",
+    "requests>=2.32.4",
     "black>=24.10.0",
     "ipython>=8.31.0",
     "isort>=5.13.2",
