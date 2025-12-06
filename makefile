@@ -43,10 +43,10 @@ stitch: output.mp4
 
 movie: output.mp4
 
-requirements.txt: pyproject.toml
+requirements.txt: pyproject.toml uv.lock
 	uv pip compile pyproject.toml --extra api --extra viz --upgrade -o requirements.txt
 
-requirements.api.txt: pyproject.toml
+requirements.api.txt: pyproject.toml uv.lock
 	uv pip compile pyproject.toml --extra api --upgrade -o requirements.api.txt
 
 build: requirements.api.txt
@@ -92,3 +92,6 @@ parse:
 term=spider
 ratio:
 	@echo "scale=2; $$(make parse | grep -c $(term)) / $$(ls out/frames/ | wc -l)" | bc
+
+upgrade:
+	uv lock --upgrade
